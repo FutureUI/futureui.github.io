@@ -395,39 +395,6 @@
   .dots button { width: 4px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .35); transition: height .5s cubic-bezier(.6, 0, .2, 1), background .5s; }
   .dots button.on { height: 20px; background: linear-gradient(var(--a1), var(--a2)); box-shadow: 0 0 10px var(--a1); }
 
-  /* ---------- 暗号门 ---------- */
-  .gate {
-    position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; padding: 24px;
-    background: radial-gradient(120% 80% at 50% 42%, rgba(38,16,46,.5), rgba(10,6,18,.86));
-    -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25);
-    transition: opacity .9s ease, visibility .9s ease;
-  }
-  .gate.open { opacity: 0; visibility: hidden; pointer-events: none; }
-  .gate-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; animation: gateIn 1.2s cubic-bezier(.16,1,.3,1) both; }
-  @keyframes gateIn { from { opacity: 0; transform: translateY(26px) scale(.94); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
-  .gate.open .gate-inner { animation: none; opacity: 0; transform: scale(1.06); filter: blur(6px); transition: opacity .9s ease, transform .9s ease, filter .9s ease; }
-  .gate-symbol {
-    width: 54px; height: 54px; border: 1px solid #efd5aa80; transform: rotate(45deg);
-    display: grid; place-items: center;
-    box-shadow: 0 0 30px -8px #ff8fb880, inset 0 0 14px #d4a1ff18;
-  }
-  .gate-symbol svg { width: 30px; transform: rotate(-45deg); filter: drop-shadow(0 0 14px #ff8fb8a0); animation: gateHeart 3.2s ease-in-out infinite; }
-  @keyframes gateHeart { 50% { transform: rotate(-45deg) scale(1.12); } }
-  .gate-title { font-size: clamp(24px, 7vw, 30px); letter-spacing: .2em; text-shadow: 0 0 24px #ff8fb860; }
-  .gate-form { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 6px; }
-  .gate-input {
-    width: min(66vw, 230px); min-height: 54px; padding: 0 18px; text-align: center;
-    font-size: 24px; letter-spacing: .42em; text-indent: .42em; color: #ffe4ef;
-    border-radius: 999px; border: 1px solid #ffffff30; background: #ffffff0e; outline: none;
-    transition: border-color .4s, box-shadow .4s, background .4s;
-  }
-  .gate-input::placeholder { color: #ffffff38; }
-  .gate-input:focus { border-color: #ffb3d1; background: #ffffff14; box-shadow: 0 0 26px -6px #ff8fb8, inset 0 0 12px #ff8fb818; }
-  .gate-button { width: min(66vw, 230px); }
-  .gate.deny .gate-form { animation: gateShake .5s ease; }
-  .gate.deny .gate-input { border-color: #ff7d9d; box-shadow: 0 0 22px -6px #ff5d87; }
-  @keyframes gateShake { 20% { transform: translateX(-10px); } 40% { transform: translateX(9px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(4px); } }
-
   @media (min-width: 700px) {
     .hud { max-width: 520px; margin: 0 auto; }
   }
@@ -495,19 +462,6 @@
   <div class="hud" id="app-hud">
     <div class="brand">LOVE NOTES</div>
   </div>
-
-  <section class="gate" id="gate" role="dialog" aria-modal="true" aria-label="输入暗号">
-    <div class="gate-inner">
-      <p class="eyebrow">LOVE NOTES</p>
-      <div class="gate-symbol" aria-hidden="true"><svg viewBox="0 0 100 88"><use href="#heartPath" fill="url(#hg)"/></svg></div>
-      <h1 class="serif gate-title">请输入暗号</h1>
-      <form class="gate-form" id="gate-form" novalidate>
-        <input class="gate-input" id="gate-input" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12" placeholder="····" aria-label="暗号" />
-        <button class="primary gate-button" id="gate-button" type="submit">进入</button>
-      </form>
-      <p class="muted status" id="gate-status" role="status" aria-live="polite"></p>
-    </div>
-  </section>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
@@ -1056,27 +1010,6 @@ deck.addEventListener('click', e => {
   if (!slide) return;
   const styles = getComputedStyle(slide);
   fx.burst(e.clientX, e.clientY, [styles.getPropertyValue('--c1').trim(), styles.getPropertyValue('--c2').trim(), '#ffffff'], 12);
-});
-
-/* ---------- 暗号门 ---------- */
-const GATE_CODE = '1017';
-const gate = $('#gate');
-document.body.classList.add('gated');
-$('#app').inert = true;
-$('#gate-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const input = $('#gate-input');
-  if (input.value === GATE_CODE) {
-    $('#app').inert = false;
-    gate.classList.add('open');
-    setTimeout(() => { gate.hidden = true; document.body.classList.remove('gated'); }, 950);
-  } else {
-    gate.classList.remove('deny');
-    void gate.offsetWidth;
-    gate.classList.add('deny');
-    $('#gate-status').textContent = input.value ? '暗号不对，再想想呢' : '请输入暗号';
-    input.select();
-  }
 });
 
 renderCollection();
